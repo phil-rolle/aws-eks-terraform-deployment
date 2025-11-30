@@ -1,0 +1,54 @@
+# terraform.tfvars.example
+# Example variable values for the EKS deployment
+# Copy this file to terraform.tfvars and customize as needed
+
+region = "us-east-1"
+
+name_prefix = "eks-demo-"
+
+cluster_name = "eks-demo-cluster"
+
+kubernetes_version = "1.28"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+
+# Node Group Configuration
+node_desired_size = 2
+node_min_size     = 2
+node_max_size     = 4
+node_instance_type = "t3.medium"
+node_capacity_type = "ON_DEMAND"  # Options: ON_DEMAND or SPOT
+
+# Logging Configuration
+enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+log_retention_days = 7
+
+# EKS API Server Access
+public_access_cidrs = ["0.0.0.0/0"]  # Restrict this in production!
+
+# Application Configuration
+app_name      = "nginx"
+app_namespace = "default"
+app_image     = "nginx:alpine"
+app_replicas  = 2
+app_port      = 80
+
+# Resource Limits
+app_cpu_request    = "100m"
+app_memory_request = "128Mi"
+app_cpu_limit      = "500m"
+app_memory_limit   = "512Mi"
+
+# Deployment Method
+deploy_with_yaml = true  # Set to false to deploy manually with kubectl or Helm
+
+# Tags
+tags = {
+  Environment = "dev"
+  Project     = "eks-demo"
+  ManagedBy   = "Terraform"
+}
+
