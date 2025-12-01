@@ -240,6 +240,65 @@ kubectl get service -n nginx
 - **Network Segmentation:** Public subnets for load balancers, private subnets for compute
 - **API Server Access:** Consider restricting `public_access_cidrs` in production environments
 
+### Security Scanner Findings (tfsec)
+
+This project uses `tfsec` for security scanning. The following findings are **intentionally left as-is** for this demo/take-home assignment, with justifications:
+
+#### CRITICAL Findings (Accepted for Demo)
+
+1. **Public EKS Cluster Access (`endpoint_public_access = true`)**
+   - **Justification:** Required for easy access during demo/testing without VPN setup. The cluster API endpoint is publicly accessible but still requires authentication via AWS IAM.
+   - **Production Fix:** Set `endpoint_public_access = false` and use `endpoint_private_access = true` with VPN/bastion host access.
+
+2. **Public Access CIDR (`0.0.0.0/0`)**
+   - **Justification:** Allows access from any IP for demo purposes, simplifying testing and review.
+   - **Production Fix:** Restrict `public_access_cidrs` to specific corporate IP ranges or VPN endpoints.
+
+3. **Security Group Egress to `0.0.0.0/0`**
+   - **Justification:** Required for nodes to pull container images from public registries (Docker Hub, ECR public) and access AWS services. This is standard for EKS node groups.
+   - **Production Fix:** Use VPC endpoints for AWS services and restrict egress to specific CIDR ranges where possible.
+
+4. **Security Group Ingress from `0.0.0.0/0` (Port 80/443)**
+   - **Justification:** Required for LoadBalancer service type to accept traffic from the internet. This is expected behavior for a public-facing web service.
+   - **Production Fix:** Use an Application Load Balancer (ALB) with WAF, or restrict to specific IP ranges if internal-only access is required.
+
+#### HIGH Findings (Accepted for Demo)
+
+5. **No EKS Secret Encryption**
+   - **Justification:** Simplifies deployment for demo purposes. EKS secrets are still encrypted at rest by AWS by default.
+   - **Production Fix:** Enable `encryption_config` with customer-managed KMS keys for additional encryption control.
+
+6. **Public IP on Public Subnets (`map_public_ip_on_launch = true`)**
+   - **Justification:** Required for resources in public subnets (NAT Gateway, future load balancers) to have internet access. This is standard for public subnets.
+   - **Production Fix:** This is correct behavior for public subnets. Only private subnets should have this disabled.
+
+#### MEDIUM Findings (Accepted for Demo)
+
+7. **No VPC Flow Logs**
+   - **Justification:** Adds cost and complexity for a demo. Flow logs are useful for production troubleshooting but not essential for a take-home assignment.
+   - **Production Fix:** Enable VPC Flow Logs to S3 or CloudWatch Logs for network traffic analysis and security monitoring.
+
+#### LOW Findings (Accepted for Demo)
+
+8. **CloudWatch Log Group Not Encrypted**
+   - **Justification:** Default CloudWatch encryption is sufficient for demo purposes. Customer-managed keys add complexity.
+   - **Production Fix:** Enable KMS encryption for CloudWatch log groups using customer-managed keys.
+
+### Production Hardening Recommendations
+
+For production deployments, consider implementing:
+
+- **Private EKS API endpoint** with VPN/bastion access
+- **Restricted public access CIDRs** to specific IP ranges
+- **EKS secret encryption** with customer-managed KMS keys
+- **VPC Flow Logs** for network monitoring and security analysis
+- **KMS encryption** for CloudWatch log groups
+- **WAF** on Application Load Balancer for web traffic protection
+- **Network policies** for pod-to-pod communication control
+- **Pod Security Standards** or OPA Gatekeeper for runtime security
+
+**Note:** The security findings are documented here for transparency. This configuration is appropriate for a demo/take-home assignment but should be hardened before production use.
+
 ---
 
 ## Design Choices/Rationale
