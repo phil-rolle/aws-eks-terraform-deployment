@@ -388,7 +388,7 @@ Both approaches are included to demonstrate:
 - **Log Aggregation:** Consider Fluent Bit/Fluentd for advanced log forwarding
 - **Network Policies:** Implement Kubernetes network policies for pod-to-pod communication control
 - **Secrets Management:** Integrate AWS Secrets Manager or external-secrets operator
-- **CI/CD:** ~~Add GitHub Actions workflow for automated deployment~~ ✅ **Implemented!** See CI/CD Pipeline section below
+- **CI/CD:** ✅ **Linting/security checks implemented!** Template deployment workflow included to demonstrate structure. See CI/CD Pipeline section below
 - **Blue/Green Deployments:** Implement deployment strategies for zero-downtime updates
 - **Cost Optimization:** Consider Spot instances for node groups, Fargate for serverless workloads
 - **Disaster Recovery:** Add backup and restore procedures for etcd and application data
@@ -441,7 +441,8 @@ Both approaches are included to demonstrate:
 │               └── _helpers.tpl
 ├── .github/
 │   └── workflows/
-│       └── terraform-checks.yml # CI/CD pipeline for linting and security
+│       ├── terraform-checks.yml  # CI/CD pipeline for linting and security (active)
+│       └── terraform-deploy.yml  # Template workflow for automated deployment
 ├── README.md                    # This file
 └── .gitignore                   # Git ignore rules
 ```
@@ -450,16 +451,20 @@ Both approaches are included to demonstrate:
 
 ## CI/CD Pipeline
 
-This repository includes an optional GitHub Actions workflow that automatically runs code quality and security checks on Terraform code. This was added as a bonus feature to demonstrate CI/CD best practices and automated code quality checks.
+This repository includes GitHub Actions workflows for automated code quality checks and a template for deployment automation. This demonstrates CI/CD best practices and infrastructure automation patterns.
 
-### What It Does
+### 1. Linting and Security Checks (Implemented)
 
-The workflow (`.github/workflows/terraform-checks.yml`) runs on:
+**Workflow:** `.github/workflows/terraform-checks.yml`
+
+This workflow automatically runs code quality and security checks on Terraform code.
+
+**Triggers:**
 - Pushes to `main` branch
 - Pull requests to `main` branch
 - Only when Terraform files are modified
 
-### Checks Performed
+**Checks Performed:**
 
 1. **tflint** - Terraform linter that checks for:
    - Best practices and conventions
@@ -477,13 +482,47 @@ The workflow (`.github/workflows/terraform-checks.yml`) runs on:
 
 4. **terraform validate** - Validates Terraform syntax and configuration
 
-### Viewing Results
-
+**Viewing Results:**
 - Check the "Actions" tab in GitHub to see workflow runs
 - Green checkmark = all checks passed
 - Red X = issues found (review the logs)
 
-### Running Locally
+### 2. Deployment Workflow (Template)
+
+**Workflow:** `.github/workflows/terraform-deploy.yml`
+
+This is a **template workflow** demonstrating the structure for automated Terraform deployment. It is **not enabled by default** and requires configuration before use.
+
+**Features:**
+- **Terraform Plan** on pull requests (with PR comments)
+- **Terraform Apply** on merge to main (with environment protection)
+- **Terraform Destroy** via manual dispatch (with extra protection)
+- Remote state backend support (S3 + DynamoDB)
+- Plan artifact management
+- Deployment summaries
+
+**To Enable:**
+1. Configure remote state backend (S3 + DynamoDB)
+2. Set up AWS credentials as GitHub Secrets:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `AWS_REGION`
+   - `TF_STATE_BUCKET`
+   - `TF_STATE_LOCK_TABLE`
+3. Configure environment protection rules in GitHub Settings
+4. Review and customize the workflow as needed
+
+**Best Practices Included:**
+- OIDC authentication support (commented)
+- Environment protection for production
+- Plan artifacts for safe applies
+- Manual approval gates
+- Concurrency controls
+- Deployment summaries
+
+**Note:** For production use, consider using OIDC for AWS authentication instead of access keys, and implement additional safeguards like cost estimation, policy as code, and rollback procedures.
+
+### Running Checks Locally
 
 You can run these checks locally before pushing:
 
