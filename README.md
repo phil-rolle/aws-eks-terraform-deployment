@@ -137,6 +137,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    kubectl get pods --all-namespaces
    ```
    
+   Example output from kubectl commands:
+   
+   ![Kubectl Examples](docs/kubectl-examples.png)
+   
    You can also verify the cluster in the AWS Console. The EKS cluster should be visible with all its configuration:
    
    ![EKS Cluster in AWS Console](docs/eks-demo-cluster.png)
