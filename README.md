@@ -86,6 +86,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    - Keep a record of what will be changed
    - Apply the exact plan later with `terraform apply tfplan`
 
+   Example output from `terraform plan`:
+   
+   ![Terraform Plan](docs/terraform-plan.png)
+
 6. **Apply the infrastructure**
    ```bash
    terraform apply
