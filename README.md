@@ -101,7 +101,7 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    ```
    
    This will create:
-   - VPC with public and private subnets
+- VPC with public and private subnets
    - Internet Gateway and NAT Gateway
    - Security groups for EKS cluster and nodes
    - IAM roles for EKS cluster and node groups
@@ -634,7 +634,7 @@ This JSON response typically indicates the LoadBalancer is routing to the Kubern
 
 6. **Check ELB security group in AWS Console:**
    - Go to EC2 > Load Balancers in AWS Console
-   - Find the LoadBalancer (starts with `a27462f...` or similar)
+   - Find the LoadBalancer (will have a unique identifier)
    - Check the security group attached to the ELB
    - Ensure it allows inbound traffic on port 80 from `0.0.0.0/0`
    - The ELB security group should also allow outbound traffic to the node security group
