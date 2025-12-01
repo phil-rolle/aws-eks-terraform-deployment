@@ -68,10 +68,31 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    ```bash
    terraform plan
    ```
+   
+   **(Optional)** Save the plan to a file for review:
+   ```bash
+   terraform plan -out=tfplan
+   ```
+   
+   Review the plan file:
+   ```bash
+   terraform show tfplan
+   ```
+   
+   This allows you to:
+   - Review the plan in detail before applying
+   - Share the plan with team members for review
+   - Keep a record of what will be changed
+   - Apply the exact plan later with `terraform apply tfplan`
 
 6. **Apply the infrastructure**
    ```bash
    terraform apply
+   ```
+   
+   Or if you created a plan file:
+   ```bash
+   terraform apply tfplan
    ```
    
    This will create:
