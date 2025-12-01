@@ -45,7 +45,7 @@ resource "aws_subnet" "public" {
 
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone        = data.aws_availability_zones.available.names[count.index]
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
   tags = merge(
@@ -68,8 +68,8 @@ resource "aws_subnet" "private" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.name_prefix}private-subnet-${substr(data.aws_availability_zones.available.names[count.index], -1, 1)}"
-      Type = "private"
+      Name                              = "${var.name_prefix}private-subnet-${substr(data.aws_availability_zones.available.names[count.index], -1, 1)}"
+      Type                              = "private"
       "kubernetes.io/role/internal-elb" = "1"
     }
   )

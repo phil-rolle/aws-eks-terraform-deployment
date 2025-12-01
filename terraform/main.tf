@@ -14,13 +14,13 @@ provider "aws" {
 
 # Data source to get EKS cluster details
 data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
+  name       = module.eks.cluster_name
   depends_on = [module.eks]
 }
 
 # Data source to get EKS cluster authentication
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
+  name       = module.eks.cluster_name
   depends_on = [module.eks]
 }
 
@@ -49,42 +49,42 @@ module "iam" {
 
 # VPC module to create networking resources (VPC, subnets, routing)
 module "vpc" {
-  source      = "./modules/vpc"
-  name_prefix = var.name_prefix
-  vpc_cidr    = var.vpc_cidr
+  source               = "./modules/vpc"
+  name_prefix          = var.name_prefix
+  vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-  tags        = var.tags
+  tags                 = var.tags
 }
 
 # Security module to create Security Groups linked to the VPC
 module "security" {
-  source      = "./modules/security"
-  name_prefix = var.name_prefix
-  vpc_id      = module.vpc.vpc_id
+  source       = "./modules/security"
+  name_prefix  = var.name_prefix
+  vpc_id       = module.vpc.vpc_id
   cluster_name = var.cluster_name
-  tags        = var.tags
+  tags         = var.tags
 }
 
 # EKS module to define the cluster, node group, and add-ons
 module "eks" {
   source = "./modules/eks"
 
-  cluster_name           = var.cluster_name
-  kubernetes_version     = var.kubernetes_version
-  cluster_role_arn       = module.iam.eks_cluster_role_arn
-  node_role_arn          = module.iam.eks_nodes_role_arn
-  subnet_ids             = module.vpc.private_subnet_ids
+  cluster_name              = var.cluster_name
+  kubernetes_version        = var.kubernetes_version
+  cluster_role_arn          = module.iam.eks_cluster_role_arn
+  node_role_arn             = module.iam.eks_nodes_role_arn
+  subnet_ids                = module.vpc.private_subnet_ids
   cluster_security_group_id = module.security.eks_cluster_sg_id
-  node_desired_size      = var.node_desired_size
-  node_min_size          = var.node_min_size
-  node_max_size          = var.node_max_size
-  node_instance_type     = var.node_instance_type
-  node_capacity_type     = var.node_capacity_type
+  node_desired_size         = var.node_desired_size
+  node_min_size             = var.node_min_size
+  node_max_size             = var.node_max_size
+  node_instance_type        = var.node_instance_type
+  node_capacity_type        = var.node_capacity_type
   enabled_cluster_log_types = var.enabled_cluster_log_types
-  log_retention_days     = var.log_retention_days
-  public_access_cidrs    = var.public_access_cidrs
-  tags                   = var.tags
+  log_retention_days        = var.log_retention_days
+  public_access_cidrs       = var.public_access_cidrs
+  tags                      = var.tags
 
   depends_on = [
     module.vpc,
