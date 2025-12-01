@@ -132,7 +132,7 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
 
    If you deployed with Terraform (`deploy_with_yaml = true`), get the LoadBalancer URL:
    ```bash
-   kubectl get service nginx -n default
+   kubectl get service nginx -n nginx
    ```
    
    Or use Terraform output:
@@ -185,8 +185,8 @@ kubectl apply -f ../k8s/manifests/deployment.yaml
 kubectl apply -f ../k8s/manifests/service.yaml
 
 # Check status
-kubectl get pods -n default
-kubectl get service nginx -n default
+kubectl get pods -n nginx
+kubectl get service nginx -n nginx
 ```
 
 #### Option 2b: Deploy with Helm
@@ -201,8 +201,8 @@ helm install my-app ../k8s/helm/my-app --set replicaCount=3
 
 # Check status
 helm list
-kubectl get pods -n default
-kubectl get service -n default
+kubectl get pods -n nginx
+kubectl get service -n nginx
 ```
 
 **Pros:**
@@ -504,7 +504,7 @@ terraform destroy
 - Check CloudWatch logs for node group issues
 
 ### Application not accessible
-- Verify LoadBalancer service is created: `kubectl get service -n default`
+- Verify LoadBalancer service is created: `kubectl get service -n nginx`
 - Check LoadBalancer status in AWS Console (ELB)
 - Ensure security groups allow traffic on port 80/443
 - Wait a few minutes for the LoadBalancer to be provisioned

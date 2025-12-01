@@ -104,7 +104,7 @@ variable "app_name" {
 variable "app_namespace" {
   description = "Kubernetes namespace for the application"
   type        = string
-  default     = "default"
+  default     = "nginx"
 }
 
 variable "app_image" {

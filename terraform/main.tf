@@ -102,6 +102,10 @@ resource "kubernetes_namespace" "app" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [metadata[0].annotations]
+  }
+
   depends_on = [module.eks]
 }
 

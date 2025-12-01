@@ -4,7 +4,7 @@ This directory contains plain YAML Kubernetes manifests for deploying the nginx 
 
 ## Files
 
-- `namespace.yaml` - Creates the default namespace
+- `namespace.yaml` - Creates the nginx namespace
 - `deployment.yaml` - Deploys nginx with 2 replicas
 - `service.yaml` - Creates a LoadBalancer service to expose nginx
 
