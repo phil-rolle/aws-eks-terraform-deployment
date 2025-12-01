@@ -128,6 +128,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    kubectl get nodes
    kubectl get pods --all-namespaces
    ```
+   
+   You can also verify the cluster in the AWS Console. The EKS cluster should be visible with all its configuration:
+   
+   ![EKS Cluster in AWS Console](docs/eks-demo-cluster.png)
 
 9. **Access the application**
 
