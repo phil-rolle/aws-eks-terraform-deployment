@@ -192,6 +192,11 @@ resource "kubernetes_service" "nginx" {
     labels = {
       app = var.app_name
     }
+    annotations = {
+      # Ensure LoadBalancer is created in public subnets
+      "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+      "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
+    }
   }
 
   spec {

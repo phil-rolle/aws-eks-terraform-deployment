@@ -114,6 +114,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    Example output from `terraform apply`:
    
    ![Terraform Apply](docs/terraform-apply.png)
+   
+   Example of completed `terraform apply`:
+   
+   ![Terraform Apply Complete](docs/terraform-apply-complete.png)
 
 7. **Configure kubectl** (if not done automatically)
    
@@ -150,6 +154,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
    ```
    
    Access the nginx service at the LoadBalancer URL.
+   
+   Example of the working nginx service:
+   
+   ![Working Service](docs/working-service.png)
 
 ---
 
@@ -572,10 +580,91 @@ terraform destroy
 - Check CloudWatch logs for node group issues
 
 ### Application not accessible
+
+**If you see a 401 Unauthorized error (JSON response):**
+
+This JSON response typically indicates the LoadBalancer is routing to the Kubernetes API server instead of nginx pods. This can happen if:
+- The ELB security group isn't properly configured
+- The LoadBalancer was created in private subnets only
+- There's a routing issue
+
+**Check the following:**
+
+1. **Verify pods are running:**
+   ```bash
+   kubectl get pods -n nginx
+   ```
+   Pods should show `Running` status. If they're `Pending` or `CrashLoopBackOff`, check logs:
+   ```bash
+   kubectl describe pod <pod-name> -n nginx
+   kubectl logs <pod-name> -n nginx
+   ```
+
+2. **Verify service is properly configured:**
+   ```bash
+   kubectl get service nginx -n nginx
+   kubectl describe service nginx -n nginx
+   ```
+   Check that:
+   - Service type is `LoadBalancer`
+   - Endpoints are listed (should show pod IPs)
+   - LoadBalancer has an external hostname/IP
+
+3. **Check LoadBalancer status:**
+   ```bash
+   kubectl get service nginx -n nginx -o wide
+   ```
+   The `EXTERNAL-IP` should show a hostname (not `<pending>`). If it's pending, wait a few minutes for AWS to provision the ELB.
+
+4. **Verify service selector matches pod labels:**
+   ```bash
+   kubectl get pods -n nginx --show-labels
+   kubectl get service nginx -n nginx -o yaml | grep selector
+   ```
+   The service selector should match the pod labels (both should have `app: nginx`).
+
+5. **Check if LoadBalancer is routing correctly:**
+   - Wait 2-5 minutes after service creation for the LoadBalancer to be fully provisioned
+   - Verify the LoadBalancer in AWS Console (EC2 > Load Balancers)
+   - Check security groups allow traffic on port 80
+
+6. **Check ELB security group in AWS Console:**
+   - Go to EC2 > Load Balancers in AWS Console
+   - Find the LoadBalancer (starts with `a27462f...` or similar)
+   - Check the security group attached to the ELB
+   - Ensure it allows inbound traffic on port 80 from `0.0.0.0/0`
+   - The ELB security group should also allow outbound traffic to the node security group
+
+7. **Verify LoadBalancer is in public subnets:**
+   - In AWS Console, check the LoadBalancer details
+   - Ensure it's associated with public subnets (not just private)
+   - LoadBalancers need public subnets to receive internet traffic
+
+8. **Verify ELB target health:**
+   - In AWS Console: EC2 > Load Balancers > [your-elb] > Target Groups
+   - Check if targets are healthy
+   - If unhealthy, review health check settings and security group rules
+
+9. **Check ELB target health:**
+   ```bash
+   # Get the LoadBalancer name from the service
+   kubectl get service nginx -n nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+   
+   # Then check in AWS Console: EC2 > Load Balancers > [your-elb] > Target Groups
+   # Verify targets are healthy
+   ```
+
+10. **Common fix - Update service annotation (if needed):**
+    If the LoadBalancer isn't working, you may need to add annotations:
+    ```bash
+    kubectl annotate service nginx -n nginx service.beta.kubernetes.io/aws-load-balancer-type=elb
+    ```
+
+**General troubleshooting:**
 - Verify LoadBalancer service is created: `kubectl get service -n nginx`
-- Check LoadBalancer status in AWS Console (ELB)
+- Check LoadBalancer status in AWS Console (EC2 > Load Balancers)
 - Ensure security groups allow traffic on port 80/443
-- Wait a few minutes for the LoadBalancer to be provisioned
+- Wait a few minutes for the LoadBalancer to be provisioned (can take 2-5 minutes)
 
 ### Terraform provider errors
 - Ensure Terraform and provider versions are compatible
