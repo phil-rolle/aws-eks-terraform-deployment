@@ -641,20 +641,16 @@ This JSON response typically indicates the LoadBalancer is routing to the Kubern
    - LoadBalancers need public subnets to receive internet traffic
 
 8. **Verify ELB target health:**
-   - In AWS Console: EC2 > Load Balancers > [your-elb] > Target Groups
-   - Check if targets are healthy
-   - If unhealthy, review health check settings and security group rules
-
-9. **Check ELB target health:**
    ```bash
    # Get the LoadBalancer name from the service
    kubectl get service nginx -n nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-   
-   # Then check in AWS Console: EC2 > Load Balancers > [your-elb] > Target Groups
-   # Verify targets are healthy
    ```
+   
+   Then in AWS Console: EC2 > Load Balancers > [your-elb] > Target Groups
+   - Check if targets are healthy
+   - If unhealthy, review health check settings and security group rules
 
-10. **Common fix - Update service annotation (if needed):**
+9. **Common fix - Update service annotation (if needed):**
     If the LoadBalancer isn't working, you may need to add annotations:
     ```bash
     kubectl annotate service nginx -n nginx service.beta.kubernetes.io/aws-load-balancer-type=elb
