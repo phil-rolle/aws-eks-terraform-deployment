@@ -8,7 +8,7 @@ name_prefix = "eks-demo-"
 
 cluster_name = "eks-demo-cluster"
 
-kubernetes_version = "1.31"
+kubernetes_version = "1.33"
 
 # VPC Configuration
 vpc_cidr = "10.0.0.0/16"
