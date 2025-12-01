@@ -308,7 +308,7 @@ Both approaches are included to demonstrate:
 - **Log Aggregation:** Consider Fluent Bit/Fluentd for advanced log forwarding
 - **Network Policies:** Implement Kubernetes network policies for pod-to-pod communication control
 - **Secrets Management:** Integrate AWS Secrets Manager or external-secrets operator
-- **CI/CD:** Add GitHub Actions workflow for automated deployment
+- **CI/CD:** ~~Add GitHub Actions workflow for automated deployment~~ ✅ **Implemented!** See CI/CD Pipeline section below
 - **Blue/Green Deployments:** Implement deployment strategies for zero-downtime updates
 - **Cost Optimization:** Consider Spot instances for node groups, Fargate for serverless workloads
 - **Disaster Recovery:** Add backup and restore procedures for etcd and application data
@@ -327,6 +327,7 @@ Both approaches are included to demonstrate:
 │   ├── outputs.tf              # Root-level outputs
 │   ├── versions.tf              # Provider version constraints
 │   ├── terraform.tfvars.example # Example variable values
+│   ├── .tflint.hcl              # tflint configuration
 │   └── modules/
 │       ├── vpc/                 # VPC, subnets, IGW, NAT Gateway
 │       │   ├── main.tf
@@ -358,8 +359,77 @@ Both approaches are included to demonstrate:
 │               ├── service.yaml
 │               ├── namespace.yaml
 │               └── _helpers.tpl
+├── .github/
+│   └── workflows/
+│       └── terraform-checks.yml # CI/CD pipeline for linting and security
 ├── README.md                    # This file
 └── .gitignore                   # Git ignore rules
+```
+
+---
+
+## CI/CD Pipeline
+
+This repository includes a GitHub Actions workflow that automatically runs code quality and security checks on Terraform code.
+
+### What It Does
+
+The workflow (`.github/workflows/terraform-checks.yml`) runs on:
+- Pushes to `main` branch
+- Pull requests to `main` branch
+- Only when Terraform files are modified
+
+### Checks Performed
+
+1. **tflint** - Terraform linter that checks for:
+   - Best practices and conventions
+   - Deprecated syntax
+   - Unused declarations
+   - AWS provider-specific rules
+
+2. **tfsec** - Security scanner that checks for:
+   - Security misconfigurations
+   - Exposed secrets
+   - Insecure defaults
+   - AWS security best practices
+
+3. **terraform fmt** - Formatting check to ensure consistent code style
+
+4. **terraform validate** - Validates Terraform syntax and configuration
+
+### Viewing Results
+
+- Check the "Actions" tab in GitHub to see workflow runs
+- Green checkmark = all checks passed
+- Red X = issues found (review the logs)
+
+### Running Locally
+
+You can run these checks locally before pushing:
+
+```bash
+cd terraform
+
+# Install tflint (if not already installed)
+# macOS: brew install tflint
+# Linux: See https://github.com/terraform-linters/tflint
+
+# Run tflint
+tflint --init
+tflint
+
+# Install tfsec (if not already installed)
+# macOS: brew install tfsec
+# Linux: See https://aquasecurity.github.io/tfsec/latest/getting-started/installation/
+
+# Run tfsec
+tfsec .
+
+# Check formatting
+terraform fmt -check -recursive
+
+# Validate
+terraform validate
 ```
 
 ---

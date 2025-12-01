@@ -1,8 +1,9 @@
 # Local .terraform directories
 **/.terraform/*
 
-# Local documents (PDF files only)
+# Local documents
 docs/*.pdf
+docs/*.txt
 
 # .tfstate files
 *.tfstate
