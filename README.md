@@ -14,6 +14,7 @@ Additional features include:
 - IAM roles following AWS best practices
 - Support for both YAML manifests and Helm chart deployment approaches
 - Modular, reusable Terraform code structure
+- CI/CD pipeline with automated linting (tflint) and security scanning (tfsec) via GitHub Actions
 
 This project was designed as a proof-of-concept to demonstrate EKS deployment capabilities as well as provide a robust, repeatable, and secure way to deploy this infrastructure using Terraform.
 
@@ -370,7 +371,7 @@ Both approaches are included to demonstrate:
 
 ## CI/CD Pipeline
 
-This repository includes a GitHub Actions workflow that automatically runs code quality and security checks on Terraform code.
+This repository includes an optional GitHub Actions workflow that automatically runs code quality and security checks on Terraform code. This was added as a bonus feature to demonstrate CI/CD best practices and automated code quality checks.
 
 ### What It Does
 
