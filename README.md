@@ -106,6 +106,10 @@ This project was designed as a proof-of-concept to demonstrate EKS deployment ca
 
    **Note:** EKS cluster creation typically takes 10-15 minutes. The node group will be created after the cluster is ready.
 
+   Example output from `terraform apply`:
+   
+   ![Terraform Apply](docs/terraform-apply.png)
+
 7. **Configure kubectl** (if not done automatically)
    
    After the cluster is created, configure kubectl:
@@ -360,16 +364,34 @@ Both approaches are included to demonstrate:
 
 ---
 
-## Cleanup
+## Cleanup / Destroying Resources
 
-To destroy all resources created by Terraform:
+### If Using Terraform for Deployment (`deploy_with_yaml = true`)
+
+If you deployed the application using Terraform (default approach), you can destroy all resources with a single command:
 
 ```bash
 cd terraform
 terraform destroy
 ```
 
-**Note:** If you deployed the application manually (kubectl/Helm), delete it first:
+This will destroy:
+- Kubernetes resources (deployment, service, namespace)
+- EKS cluster and node group
+- Security groups
+- IAM roles
+- VPC and all networking components (NAT Gateway, Internet Gateway, subnets, route tables)
+- CloudWatch log groups
+
+**Note:** Terraform will prompt for confirmation before destroying resources. Review the destruction plan carefully.
+
+Example output from `terraform destroy`:
+
+![Terraform Destroy](docs/terraform-destroy.png)
+
+### If Using Manual Deployment (kubectl/Helm)
+
+If you deployed the application manually using kubectl or Helm, you should delete the Kubernetes resources first:
 
 ```bash
 # If using kubectl
@@ -379,7 +401,19 @@ kubectl delete -f ../k8s/manifests/
 helm uninstall my-app
 ```
 
-Then run `terraform destroy` to remove the infrastructure.
+Then destroy the infrastructure:
+
+```bash
+cd terraform
+terraform destroy
+```
+
+### Important Notes
+
+- **Destruction Time:** EKS cluster deletion typically takes 5-10 minutes. NAT Gateway deletion may take a few minutes as well.
+- **Cost:** Ensure you destroy resources when not in use to avoid unnecessary AWS charges.
+- **Data Loss:** Destroying resources will permanently delete all data. Make sure to backup any important data before destruction.
+- **Dependencies:** Terraform will automatically handle resource dependencies and destroy resources in the correct order.
 
 ---
 
